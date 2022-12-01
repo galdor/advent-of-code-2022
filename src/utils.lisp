@@ -1,16 +1,22 @@
 (defpackage :aoc2022-utils
   (:use :cl)
   (:export
+   :open-day-page
    :*firefox-profile-directory*
    :default-firefox-profile
    :advent-of-code-cookie
    :download-input-file
-
    :input-file-path
    :input-file-data
    :input-file-lines))
 
 (in-package :aoc2022-utils)
+
+(defun open-day-page (day)
+  "Open the web page for a specific day in Firefox."
+  (let* ((uri (format nil "https://adventofcode.com/2022/day/~D" day))
+         (command `("firefox" ,uri)))
+    (uiop:run-program command :force-shell t :output nil :error-output t)))
 
 (defparameter *firefox-profile-directory*
   (merge-pathnames
