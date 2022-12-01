@@ -1,8 +1,9 @@
 (defpackage :aoc2022-utils
   (:use :cl)
   (:export
-   :open-day-page
+   :*http-user-agent*
    :*firefox-profile-directory*
+   :open-day-page
    :default-firefox-profile
    :advent-of-code-cookie
    :download-input-file
@@ -12,17 +13,21 @@
 
 (in-package :aoc2022-utils)
 
-(defun open-day-page (day)
-  "Open the web page for a specific day in Firefox."
-  (let* ((uri (format nil "https://adventofcode.com/2022/day/~D" day))
-         (command `("firefox" ,uri)))
-    (uiop:run-program command :force-shell t :output nil :error-output t)))
+(defparameter *http-user-agent*
+  "https://github.com/galdor/advent-of-code-2022"
+  "The user agent used for requests sent to the Advent of Code website.")
 
 (defparameter *firefox-profile-directory*
   (merge-pathnames
    (make-pathname :directory '(:relative ".mozilla" "firefox"))
    (user-homedir-pathname))
   "The path of the directory containing Firefox profiles.")
+
+(defun open-day-page (day)
+  "Open the web page for a specific day in Firefox."
+  (let* ((uri (format nil "https://adventofcode.com/2022/day/~D" day))
+         (command `("firefox" ,uri)))
+    (uiop:run-program command :force-shell t :output nil :error-output t)))
 
 (defun default-firefox-profile ()
   "Return the name of the default Firefox profile."
@@ -105,11 +110,13 @@ command, because the file is locked. Fingers crossed."
          (output-path (input-file-path day))
          (cookie (advent-of-code-cookie))
          (session (concatenate 'string "Cookie: session=" cookie))
+         (user-agent (concatenate 'string "User-Agent: " *http-user-agent*))
          (command `("curl" "--silent"
                            "--show-error"
                            "--fail"
                            "--location"
                            "--header" ,session
+                           "--header" ,user-agent
                            "--output" ,(namestring output-path)
                            ,uri)))
     (uiop:run-program command :force-shell t :output nil :error-output t)
