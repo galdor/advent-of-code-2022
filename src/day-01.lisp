@@ -2,7 +2,6 @@
   (:use :cl :aoc2022-utils)
   (:export
    :*lines*
-   :count-calories
    :solve-1
    :solve-2))
 
