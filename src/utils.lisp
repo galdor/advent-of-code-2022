@@ -9,7 +9,8 @@
    :download-input-file
    :input-file-path
    :input-file-data
-   :input-file-lines))
+   :input-file-lines
+   :split-string))
 
 (in-package :aoc2022-utils)
 
@@ -155,3 +156,13 @@ command, because the file is locked. Fingers crossed."
         ((eq (car lines) 'eof)
          (nreverse (cdr lines)))
       (push (read-line file nil 'eof) lines))))
+
+(defun split-string (string separator)
+  (let ((parts nil)
+        (start 0))
+    (loop
+      (let ((idx (search separator string :test #'string= :start2 start)))
+        (push (subseq string start idx) parts)
+        (unless idx
+          (return-from split-string (nreverse parts) ))
+        (setf start (+ idx (length separator)))))))
