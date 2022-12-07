@@ -9,6 +9,7 @@
    :download-input-file
    :input-file-path
    :input-file-data
+   :read-file-lines
    :input-file-lines
    :split-string))
 
@@ -148,18 +149,20 @@ command, because the file is locked. Fingers crossed."
            (return-from input-file-data (adjust-array data end)))
          (setf offset end))))))
 
-(defun input-file-lines (day)
-  "Return the content of an input files as a list of lines."
-  (with-open-file (file (input-file-path day) :external-format :utf-8)
-    (do ((path (input-file-path day))
-         (lines nil))
+(defun read-file-lines (path)
+  "Return the content of a file as a list of lines."
+  (with-open-file (file path :external-format :utf-8)
+    (do ((lines nil))
         ((eq (car lines) 'eof)
          (nreverse (cdr lines)))
       (push (read-line file nil 'eof) lines))))
 
-(defun split-string (string separator)
-  (let ((parts nil)
-        (start 0))
+(defun input-file-lines (day)
+  "Return the content of an input files as a list of lines."
+  (read-file-lines (input-file-path day)))
+
+(defun split-string (string separator &key (start 0))
+  (let ((parts nil))
     (loop
       (let ((idx (search separator string :test #'string= :start2 start)))
         (push (subseq string start idx) parts)
